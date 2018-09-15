@@ -31,7 +31,7 @@ class Wordless_Main(QMainWindow):
         self.setWindowTitle(self.tr('Wordless Version 1.0'))
         self.setWindowIcon(QIcon('images/wordless_icon.png'))
 
-        wordless_settings.load_settings(self)
+        wordless_settings.init_settings(self)
 
         self.init_central_widget()
 
@@ -50,6 +50,9 @@ class Wordless_Main(QMainWindow):
                                      QMessageBox.No)
 
         if reply == QMessageBox.Yes:
+            # Reset some settings
+            self.settings['file']['files_closed'].clear()
+
             with open('wordless_settings.pkl', 'wb') as f:
                 pickle.dump(self.settings, f)
 
@@ -184,6 +187,12 @@ class Wordless_Main(QMainWindow):
                                                   <td><a href="https://bazaar.launchpad.net/~leonardr/beautifulsoup/bs4/view/  head:/LICENSE">MIT</a></td>
                                                 </tr>
                                                 <tr>
+                                                  <td><a href="https://github.com/michmech/lemmatization-lists">Lemmatization Lists</a></td>
+                                                  <td></td>
+                                                  <td><a href="http://www.lexiconista.com/en/#contact">Michal Boleslav Měchura</a></td>
+                                                  <td><a href="https://github.com/michmech/lemmatization-lists/blob/master/LICENCE">ODbL</a></td>
+                                                </tr>
+                                                <tr>
                                                   <td><a href="https://matplotlib.org/">Matplotlib</a></td>
                                                   <td>2.2.3</td>
                                                   <td><a href="https://github.com/matplotlib/matplotlib#contact">Matplotlib Development   Team</a></td>
@@ -308,7 +317,7 @@ class Wordless_Main(QMainWindow):
 
         action_settings = QAction(self.tr('Settings'), self)
         action_settings.setStatusTip(self.tr('Change settings'))
-        action_settings.triggered.connect(self.wordless_settings.settings_load)
+        action_settings.triggered.connect(self.wordless_settings.load)
 
         action_show_status_bar = QAction(self.tr('Show Status Bar'), self, checkable = True)
         action_show_status_bar.setChecked(True)

@@ -40,7 +40,9 @@ class Wordless_Table(QTableWidget):
         self.main = parent
         self.headers = headers
         self.orientation = orientation
+        self.show_pct = True
         self.cols_pct = []
+        self.filters = []
 
         if orientation == 'Horizontal':
             super().__init__(1, len(self.headers), self.main)
@@ -138,7 +140,7 @@ class Wordless_Table(QTableWidget):
         super().setItem(row, column, item)
 
     def item_changed(self):
-        if self.item(0, 0) or self.cellWidget(0, 0):
+        if self.item(0, 0):
             self.button_export_all.setEnabled(True)
         else:
             self.button_export_all.setEnabled(False)
@@ -146,7 +148,7 @@ class Wordless_Table(QTableWidget):
         self.selection_changed()
 
     def selection_changed(self):
-        if self.selectedIndexes() and (self.item(0, 0) or self.cellWidget(0, 0)):
+        if self.selectedIndexes() and self.item(0, 0):
             self.button_export_selected.setEnabled(True)
         else:
             self.button_export_selected.setEnabled(False)
@@ -203,6 +205,8 @@ class Wordless_Table(QTableWidget):
         cols_cumulative = self.find_columns_cumulative()
 
         self.hide()
+        self.blockSignals(True)
+        self.setSortingEnabled(False)
         self.sortItems(logicalIndex, order)
 
         # Do not re-calculate rank if the sorted column itself contains rank
@@ -238,15 +242,15 @@ class Wordless_Table(QTableWidget):
 
             for row in range(self.rowCount()):
                 if not self.isRowHidden(row):
-                    self.set_item_with_pct(row, col, data_cumulative.pop(0), data_total)
+                    self.set_item_with_pct(row, col - 1, self.item(row, col - 1).read_data(), data_total, show_pct = self.show_pct)
+                    self.set_item_with_pct(row, col, data_cumulative.pop(0), data_total, show_pct = self.show_pct)
 
+        self.blockSignals(False)
+        self.setSortingEnabled(True)
         self.show()
 
     def selected_rows(self):
         return sorted(set([index.row() for index in self.selectedIndexes()]))
-
-    def import_table(self):
-        pass
 
     def export_selected(self):
         pass
@@ -260,12 +264,16 @@ class Wordless_Table(QTableWidget):
         if self.orientation == 'Horizontal':
             self.setColumnCount(len(self.headers))
             self.setRowCount(header_count)
+
             self.setHorizontalHeaderLabels(self.headers)
         else:
             self.setRowCount(len(self.headers))
             self.setColumnCount(header_count)
 
             self.setVerticalHeaderLabels(self.headers)
+
+        for i in range(self.rowCount()):
+            self.showRow(i)
 
         self.setSortingEnabled(False)
 
