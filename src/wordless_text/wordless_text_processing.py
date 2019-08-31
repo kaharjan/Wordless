@@ -964,6 +964,9 @@ def wordless_get_stop_words(main, lang,
     elif list_stop_words == main.tr('Custom List'):
         stop_words = main.settings_custom['stop_words']['custom_lists'][lang]
 
+    # Remove empty tokens
+    stop_words = [stop_word for stop_word in stop_words if stop_word]
+
     return sorted(set(stop_words))
 
 def wordless_filter_stop_words(main, items, lang):
