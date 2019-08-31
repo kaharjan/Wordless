@@ -575,7 +575,9 @@ def wordless_word_detokenize(main, tokens, lang,
 
                             break
 
-    return re.sub(r'\s{2,}', ' ', text)
+    text = re.sub(r'\s{2,}', ' ', text)
+
+    return text.strip()
 
 def wordless_pos_tag(main, tokens, lang,
                      pos_tagger = 'default',
